@@ -41,9 +41,10 @@ const buildMagic = async () => {
   );
 
   const entrypoints = [
-    'arche/core/LIBRIS.ts',
-    ...componentEntries
-  ];
+  'arche/core/LIBRIS.ts',
+  'arche/core/APP.ts',
+  ...componentEntries
+];
 
   await Bun.build({
     entrypoints,
