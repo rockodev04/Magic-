@@ -123,7 +123,7 @@ class MagicCard extends HTMLElement {
   ...
 }
 
-customElements.define('bento-card', BentoCard);
+customElements.define('magic-card', MagicCard);
 ```
 
 ### ⚡ Real-Time Error Validation
