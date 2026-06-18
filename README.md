@@ -31,7 +31,7 @@ arche/
 ├ styles/            -> Global styles
 ├ images/            -> Static images
 ├ components/
-│  └ bento-card/
+│  └ magic-card/
 │     ├ munus.ts     -> Component logic
 └ core/
    └ LIBRIS.ts       -> Central validation, security and rules
@@ -53,22 +53,23 @@ calvaria/              -> PROD output (compiled and ready)
 curl -fsSL https://bun.sh/install | bash
 ```
 
-### 2. Init the project (first time)
+### 2. Init the project  and add TypeScript(first time)
 
 ```bash
-bun init
+bun init -y
+bun add typescript
 ```
 
 ### 3. Run MAGIC (DEV mode + auto-rebuild)
 
 ```bash
-bun run scripts/nexus.ts
+bun ./scripts/nexus.ts
 ```
 
 ### 4. Build for production (outputs to `calvaria/`)
 
 ```bash
-bun run scripts/nexus.ts --prod
+bun ./scripts/nexus.ts --prod
 ```
 
 ---
@@ -126,13 +127,9 @@ If a required attribute is missing, it injects a friendly error:
 ## 🌊 Example
 
 ```html
-<bento-card title="No Image">
-  This card is incomplete
-</bento-card>
+<magic-card title="No Image Card" >This card has no image</magic-card>
 
-<bento-card title="Rocko" image="./images/sample.png">
-  Looks great!
-</bento-card>
+<magic-card title="Rocko" image="./images/sample.png">Rocko Modern Life</magic-card>
 ```
 
 ---
