@@ -26,7 +26,7 @@
 * HTML5
 * CSS3
 * TypeScript (compiled via Bun)
-* No JSON APIs, no fetch, no routing
+* No JSON APIs, no fetch, no external routing libraries
 
 ---
 
