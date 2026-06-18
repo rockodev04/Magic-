@@ -1,4 +1,4 @@
-# MAGIC: Language Code & Dependencies Not Include ✨
+# MAGIC: Language Code & Dependencies Not Included. ✨
 
 **MAGIC** is an experimental frontend micro-framework designed to prove that magic exists in simplicity. Built with only HTML, CSS, and TypeScript, it focuses on clarity, security, and developer empowerment.
 
@@ -14,6 +14,13 @@
 
 ---
 
+## 🔠 Principles
+
+* **KISS** – Keep It Simple, Stupid
+* **DRY** – Don’t Repeat Yourself
+* **YAGNI** – You Ain’t Gonna Need It
+---
+
 ## 🔹 Stack
 
 * HTML5
@@ -23,6 +30,7 @@
 
 ---
 
+---
 ## 🧰 Folder Architecture
 
 ```plaintext
@@ -35,16 +43,43 @@ arche/
 │     ├ munus.ts     -> Component logic
 └ core/
    └ LIBRIS.ts       -> Central validation, security and rules
+   ├ registry.ts     -> Auto-generated map of every Magic component and its required attributes; never edit manually
+   └ ROUTER.ts       -> Client-side router that maps URL paths to Magic components and handles navigation without page reloads.
 
 scripts/
 ├ nexus.ts           -> Dev/Prod runner + file watcher + builder
-└ build.ts (optional legacy build file)
+
 
 calvaria/              -> PROD output (compiled and ready)
 ```
 
 ---
 
+## 🔧 Core Spellbook
+
+* `arche/` as development sandbox
+* `calvaria/` as production output
+* `munus.ts` for per-component logic
+* `LIBRIS.ts` with:
+
+  * ✅ Attribute validation
+  * ✅ Human-friendly errors
+  * ✅ `<magic-error>` rendering
+  * ✅ Visual component highlight
+* `nexus.ts` unified build + watch + serve
+* Static asset copying (images, styles)
+* Hashing support (`hashData`)
+* Dangerous HTML protection (`sanitizeText`)
+
+
+---
+## 🔭 Dev Experience
+
+* Live rebuild with `fs.watch`
+* Zero configuration build process
+* Instant updates to `calvaria/`
+* Human-first error reporting
+---
 ## 📚 How To Use
 
 ### 1. Install [Bun](https://bun.sh)
@@ -53,7 +88,7 @@ calvaria/              -> PROD output (compiled and ready)
 curl -fsSL https://bun.sh/install | bash
 ```
 
-### 2. Init the project  and add TypeScript(first time)
+### 2. Init the project  and install TypeScript (first time)
 
 ```bash
 bun init -y
@@ -106,24 +141,6 @@ If a required attribute is missing, it injects a friendly error:
   ⚠️ Missing "image" attribute in <bento-card title="No Image">
 </magic-error>
 ```
-
-### 🔐 Security Included
-
-* Escapes potentially dangerous HTML
-* `sanitizeText()` checks against tags like `<script>`, `<iframe>`, etc.
-* `hashData()` provides SHA-256 hashing (used for any future integrity checks)
-
----
-
-## 🔭 Dev Experience
-
-* Live rebuild with `fs.watch`
-* Zero configuration build process
-* Instant updates to `calvaria/`
-* Human-first error reporting
-
----
-
 ## 🌊 Example
 
 ```html
@@ -134,29 +151,14 @@ If a required attribute is missing, it injects a friendly error:
 
 ---
 
-## 🔧 Core Spellbook
+### 🔐 Security Included
 
-* `arche/` as development sandbox
-* `calvaria/` as production output
-* `munus.ts` for per-component logic
-* `LIBRIS.ts` with:
-
-  * ✅ Attribute validation
-  * ✅ Human-friendly errors
-  * ✅ `<magic-error>` rendering
-  * ✅ Visual component highlight
-* `nexus.ts` unified build + watch + serve
-* Static asset copying (images, styles)
-* Hashing support (`hashData`)
-* Dangerous HTML protection (`sanitizeText`)
+* Escapes potentially dangerous HTML
+* `sanitizeText()` checks against tags like `<script>`, `<iframe>`, etc.
+* `hashData()` provides SHA-256 hashing (used for any future integrity checks)
 
 ---
 
-## 🔠 Principles
-
-* **KISS** – Keep It Simple, Stupid
-* **DRY** – Don’t Repeat Yourself
-* **YAGNI** – You Ain’t Gonna Need It
 
 ---
 
@@ -167,6 +169,6 @@ Use it, fork it, break it, and make it your own.
 
 ---
 
-## ✨ MAGIC: Language Code Not Included.
+## ✨ MAGIC: Language Code & Dependencies Not Included.
 
 Because sometimes... **the best code is the one you write yourself.**
