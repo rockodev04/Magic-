@@ -58,7 +58,7 @@ calvaria/              -> PROD output (compiled and ready)
 ## 🔧 Core Spellbook
 
 * `arche/` as development sandbox
-* `calvaria/` as production output
+* `nexus.ts` unified build + watch + serve
 * `munus.ts` for per-component logic
 * `LIBRIS.ts` with:
 
@@ -66,14 +66,14 @@ calvaria/              -> PROD output (compiled and ready)
   * ✅ Human-friendly errors
   * ✅ `<magic-error>` rendering
   * ✅ Visual component highlight
-* `nexus.ts` unified build + watch + serve
+
 * `registry.ts` auto map for every component
-* `ROUTER.ts` maps url for navigation
+* `ROUTER.ts` auto maps url for navigation
 * Static asset copying (images, styles)
 * Hashing support (`hashData`)
 * Dangerous HTML protection (`sanitizeText`)
 
-
+* `calvaria/` as production output
 ---
 ## 🔭 Dev Experience
 
