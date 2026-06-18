@@ -1,4 +1,4 @@
-# MAGIC: Language Code Not Included ✨
+# MAGIC: Language Code & Dependencies Not Include ✨
 
 **MAGIC** is an experimental frontend micro-framework designed to prove that magic exists in simplicity. Built with only HTML, CSS, and TypeScript, it focuses on clarity, security, and developer empowerment.
 
