@@ -12,6 +12,7 @@
 
 import fs, { watch } from 'fs';
 import path from 'path';
+import type { ServerWebSocket } from 'bun';
 
 // ── Constants ────────────────────────────────────────────────
 const IS_PROD      = Bun.argv.includes('--prod');
@@ -21,6 +22,33 @@ const BACKEND_DIR  = `${OUT_DIR}/backend`;
 const SRC_DIR      = 'arche';
 const SERVER_DIR   = 'server';
 const PORT         = 3000;
+
+// ── Hot-reload WebSocket ─────────────────────────────────────
+// Only active in dev. Sends a "reload" message to all connected
+// browser clients whenever a file changes in arche/.
+const WS_PORT = 3001;
+const hotReloadClients = new Set<ServerWebSocket<unknown>>();
+
+const startHotReloadServer = (): void => {
+  Bun.serve({
+    port: WS_PORT,
+    fetch(req, server) {
+      if (server.upgrade(req)) return;
+      return new Response('Hot-reload WS', { status: 200 });
+    },
+    websocket: {
+      open(ws)  { hotReloadClients.add(ws); },
+      close(ws) { hotReloadClients.delete(ws); },
+      message() {},
+    },
+  });
+};
+
+const notifyReload = (): void => {
+  for (const client of hotReloadClients) {
+    client.send('reload');
+  }
+};
 
 const MIME_TYPES: Record<string, string> = {
   '.js'   : 'application/javascript',
@@ -225,12 +253,11 @@ const transpileFolder = async (src: string, dest: string): Promise<boolean> => {
     }
 
     if (item.endsWith('.ts')) {
-      // Each .ts file is transpiled individually to preserve structure
       const result = await Bun.build({
         entrypoints : [srcPath],
         outdir      : dest,
         target      : 'bun',
-        minify      : false,  // debug-friendly
+        minify      : false,
       });
 
       if (!result.success) {
@@ -239,7 +266,6 @@ const transpileFolder = async (src: string, dest: string): Promise<boolean> => {
         return false;
       }
     } else {
-      // Non-TS files (json, env templates, etc.) are copied as-is
       fs.copyFileSync(srcPath, destPath);
     }
   }
@@ -261,7 +287,6 @@ const buildBackend = async (): Promise<boolean> => {
 
   console.log('📦 Building backend...');
 
-  // 1. Single minified bundle — what actually runs in production
   const bundleResult = await Bun.build({
     entrypoints : [entry],
     outdir      : BACKEND_DIR,
@@ -278,7 +303,6 @@ const buildBackend = async (): Promise<boolean> => {
 
   console.log(`   ✓ Bundle  → ${bundleDest}`);
 
-  // 2. Transpiled structure — keeps folder layout for debugging
   const transpileOk = await transpileFolder(SERVER_DIR, srcDest);
   if (!transpileOk) return false;
 
@@ -296,6 +320,7 @@ const buildBackend = async (): Promise<boolean> => {
 //   bun run server/index.ts
 
 const startDevServer = (): void => {
+
   const transpiler = new Bun.Transpiler({ loader: 'ts' });
 
   Bun.serve({
@@ -351,15 +376,28 @@ const startDevServer = (): void => {
       }
 
       // Routes without extension → SPA fallback to index.html
-      return new Response(Bun.file(`./${SRC_DIR}/index.html`));
+      // Inject hot-reload client so the browser reloads automatically on changes
+      const html = await Bun.file(`./${SRC_DIR}/index.html`).text();
+      const injected = html.replace(
+        '</body>',
+        `<script>
+          const ws = new WebSocket('ws://localhost:${WS_PORT}');
+          ws.onmessage = () => location.reload();
+        </script>
+      </body>`
+      );
+      return new Response(injected, {
+        headers: { 'Content-Type': 'text/html' },
+      });
     },
   });
 
   console.log(`🧙 Magic DEV running at http://localhost:${PORT}`);
-  console.log(`   Frontend → arche/   (calvaria/ does not exist in dev)`);
+  console.log(`   Frontend  → arche/   (calvaria/ does not exist in dev)`);
+  console.log(`   Hot-reload → ws://localhost:${WS_PORT}`);
 
   if (hasBackend()) {
-    console.log(`   Backend  → run separately: bun run ${SERVER_DIR}/index.ts`);
+    console.log(`   Backend   → run separately: bun run ${SERVER_DIR}/index.ts`);
   }
 
   console.log('');
@@ -410,7 +448,7 @@ const startProdServer = (): void => {
 
 // ── Watcher (dev only) ───────────────────────────────────────
 // In dev there is no build to re-run — the transpiler is on-the-fly.
-// The watcher notifies the developer which file changed.
+// When a file changes, the hot-reload WS notifies the browser automatically.
 // If a server/ file changes, it reminds to restart the backend.
 
 const startWatcher = (): void => {
@@ -422,7 +460,8 @@ const startWatcher = (): void => {
       filename.endsWith('.html') ||
       filename.endsWith('.css')
     ) {
-      console.log(`🔁 Frontend change: ${filename} — reload your browser.`);
+      console.log(`🔁 Frontend change: ${filename}`);
+      notifyReload();
     }
   });
 
@@ -439,13 +478,11 @@ const startWatcher = (): void => {
 };
 
 // ── Main orchestrator ────────────────────────────────────────
-
 // Always regenerate the registry first so LIBRIS.ts is never stale,
 // regardless of whether we are in dev or prod mode.
 generateRegistry();
 
 if (IS_PROD) {
-  // Production: clean, build frontend + backend, serve frontend
   cleanOutput();
 
   const frontendOk = await buildFrontend();
@@ -461,7 +498,7 @@ if (IS_PROD) {
 
   startProdServer();
 } else {
-  // Dev: serve frontend in memory, backend runs independently
+  startHotReloadServer();
   startDevServer();
   startWatcher();
 }
