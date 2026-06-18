@@ -67,6 +67,8 @@ calvaria/              -> PROD output (compiled and ready)
   * ✅ `<magic-error>` rendering
   * ✅ Visual component highlight
 * `nexus.ts` unified build + watch + serve
+* `registry.ts` auto map for every component
+* `ROUTER.ts` maps url for navigation
 * Static asset copying (images, styles)
 * Hashing support (`hashData`)
 * Dangerous HTML protection (`sanitizeText`)
